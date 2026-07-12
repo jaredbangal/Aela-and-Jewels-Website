@@ -130,6 +130,10 @@ tailwind.config = {
   @keyframes fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   .tab-fade { animation: fadein .5s var(--ease-spring); }
 
+  /* ——— popup modal ——— */
+  .popup-overlay { transition: opacity .35s var(--ease-spring); }
+  .popup-panel { transition: opacity .4s var(--ease-spring), transform .4s var(--ease-spring); }
+
   /* ——— ambient motion: floating gems (transform/opacity only) ——— */
   @keyframes floaty {
     from { transform: translateY(0) rotate(0deg); }
@@ -143,9 +147,10 @@ tailwind.config = {
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .reveal { opacity: 1; transform: none; transition: none; }
-    .img-zoom, .btn-gold, .link-line::after, .quote-slide, .announce-msg { transition: none; }
+    .img-zoom, .btn-gold, .link-line::after, .quote-slide, .announce-msg, .popup-panel, .popup-overlay { transition: none; }
     .group:hover .img-zoom { transform: none; }
     .float-slow, .float-slower, .float-slowest, .tab-fade { animation: none; }
+    .animate-ping { animation: none; }
   }
 </style>
 </head>
@@ -160,13 +165,25 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ══════════ Navigation ══════════ -->
+<!-- ══════════ Navigation (centered logo lockup) ══════════ -->
 <header class="sticky top-0 z-40 bg-cream/90 backdrop-blur-md border-b border-linen/70">
   <nav class="mx-auto max-w-site px-6 lg:px-10" aria-label="Main">
-    <div class="flex items-center justify-between h-[76px]">
-      <!-- logo lockup -->
-      <a href="#" class="flex items-center gap-3.5 shrink-0" aria-label="Aela Jewels home">
-        <svg class="w-11 h-11" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+    <div class="relative flex items-center justify-between h-[76px]">
+      <!-- left: menu (mobile) / links (desktop) -->
+      <div class="flex items-center">
+        <button class="nav-link p-2.5 -ml-2.5 min-w-11 min-h-11 flex lg:hidden items-center justify-center" aria-label="Open menu" aria-expanded="false" data-menu-btn>
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <ul class="hidden lg:flex items-center gap-8 text-[12px] label-wide uppercase font-medium">
+          <li><a class="nav-link" href="#collection">New In</a></li>
+          <li><a class="nav-link" href="#categories">Jewellery</a></li>
+          <li><a class="nav-link" href="#love-engagement">Love &amp; Engagement</a></li>
+        </ul>
+      </div>
+
+      <!-- center: logo lockup (absolute, always centered) -->
+      <a href="#" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3.5" aria-label="Aela Jewels home">
+        <svg class="w-10 h-10 lg:w-11 lg:h-11" viewBox="0 0 96 96" fill="none" aria-hidden="true">
           <circle cx="48" cy="48" r="44.5" stroke="#1C1917" stroke-opacity="0.28" stroke-width="1.5"/>
           <g stroke="#1C1917" stroke-width="3.5" stroke-linecap="square">
             <path d="M28 72 L48 28"/><path d="M48 28 L48 72"/><path d="M48 28 L69 28"/>
@@ -175,35 +192,24 @@ tailwind.config = {
           </g>
           <path d="M48 14.6 L51.4 18 L48 21.4 L44.6 18 Z" fill="#A16207"/>
         </svg>
-        <span class="leading-none">
-          <span class="block font-display text-[26px] font-medium tracking-[.28em]">AELA</span>
-          <span class="block text-[9px] label-wide uppercase text-stone mt-1">Jewels</span>
+        <span class="leading-none hidden sm:block">
+          <span class="block font-display text-[24px] lg:text-[26px] font-medium tracking-[.28em]">AELA</span>
+          <span class="block text-[8.5px] label-wide uppercase text-stone mt-1">Jewels</span>
         </span>
       </a>
 
-      <!-- desktop links -->
-      <ul class="hidden lg:flex items-center gap-9 text-[12px] label-wide uppercase font-medium">
-        <li><a class="nav-link" href="#collection">New In</a></li>
-        <li><a class="nav-link" href="#categories">Jewellery</a></li>
-        <li><a class="nav-link" href="#collection">Love &amp; Engagement</a></li>
-        <li><a class="nav-link" href="#categories">Gifts</a></li>
-        <li><a class="nav-link" href="#story">Our World</a></li>
-      </ul>
-
-      <!-- icons -->
+      <!-- right: nav (desktop) + icons -->
       <div class="flex items-center gap-1">
+        <ul class="hidden lg:flex items-center gap-8 text-[12px] label-wide uppercase font-medium mr-6">
+          <li><a class="nav-link" href="#bespoke">Bespoke</a></li>
+          <li><a class="nav-link" href="#journal">Journal</a></li>
+        </ul>
         <button class="nav-link p-2.5 min-w-11 min-h-11 flex items-center justify-center" aria-label="Search">
           <svg class="w-[19px] h-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        </button>
-        <button class="nav-link p-2.5 min-w-11 min-h-11 hidden sm:flex items-center justify-center" aria-label="Account">
-          <svg class="w-[19px] h-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 20c1.4-3.2 4-5 7-5s5.6 1.8 7 5"/></svg>
         </button>
         <button class="nav-link p-2.5 min-w-11 min-h-11 flex items-center justify-center relative" aria-label="Shopping bag, 2 items">
           <svg class="w-[19px] h-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 8h12l-1 12.5a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 20.5Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
           <span class="absolute top-1 right-0.5 w-4 h-4 rounded-full bg-gold text-cream text-[9px] font-semibold flex items-center justify-center" aria-hidden="true">2</span>
-        </button>
-        <button class="nav-link p-2.5 min-w-11 min-h-11 flex lg:hidden items-center justify-center" aria-label="Open menu" aria-expanded="false" data-menu-btn>
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
       </div>
     </div>
@@ -213,58 +219,47 @@ tailwind.config = {
       <ul class="flex flex-col gap-1 text-[13px] label-wide uppercase font-medium">
         <li><a class="nav-link block py-2.5" href="#collection">New In</a></li>
         <li><a class="nav-link block py-2.5" href="#categories">Jewellery</a></li>
-        <li><a class="nav-link block py-2.5" href="#collection">Love &amp; Engagement</a></li>
-        <li><a class="nav-link block py-2.5" href="#categories">Gifts</a></li>
-        <li><a class="nav-link block py-2.5" href="#story">Our World</a></li>
+        <li><a class="nav-link block py-2.5" href="#love-engagement">Love &amp; Engagement</a></li>
+        <li><a class="nav-link block py-2.5" href="#bespoke">Bespoke</a></li>
+        <li><a class="nav-link block py-2.5" href="#journal">Journal</a></li>
       </ul>
     </div>
   </nav>
 </header>
 
-<main>
-  <!-- ══════════ Hero ══════════ -->
-  <section class="relative hero-atmos grain overflow-hidden">
-    <div class="mx-auto max-w-site px-6 lg:px-10 pt-14 pb-20 lg:pt-24 lg:pb-28 grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-      <!-- copy -->
-      <div class="lg:col-span-5 relative z-10">
-        <p class="reveal text-[11px] label-wide uppercase font-semibold text-gold flex items-center gap-3">
-          <svg class="w-2 h-2 text-moss" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0 8 4 4 8 0 4Z"/></svg>
-          New — The Meridian Collection
-        </p>
-        <svg class="float-slower absolute -left-2 bottom-6 w-6 h-6 text-sage/60 hidden lg:block" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M20 2 38 20 20 38 2 20Z"/></svg>
-        <h1 class="reveal font-display display-tight font-medium text-[clamp(2.9rem,7vw,4.9rem)] leading-[1.02] mt-6" style="--d:90ms">
-          Jewellery for the moments <em class="italic font-normal text-golddeep">that stay.</em>
-        </h1>
-        <p class="reveal body-relaxed text-stone text-[15px] mt-7 max-w-md" style="--d:180ms">
-          Each Aela piece is cast in recycled 9ct gold and set by hand with ethically
-          sourced stones — made slowly, worn daily, kept for good.
-        </p>
-        <div class="reveal flex flex-wrap items-center gap-7 mt-10" style="--d:270ms">
-          <a href="#collection" class="btn-gold inline-flex items-center gap-3 bg-gold text-cream text-[12px] label-wide uppercase font-semibold px-9 py-4 shadow-lift">
-            Shop the Collection
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-          </a>
-          <a href="#categories" class="link-line text-[12px] label-wide uppercase font-semibold text-moss py-2">Explore Jewellery</a>
-        </div>
-      </div>
+<!-- ══════════ Newsletter popup modal ══════════ -->
+<div class="popup-overlay hidden fixed inset-0 z-50 bg-ink/55 items-center justify-center p-6" data-popup-overlay role="dialog" aria-modal="true" aria-labelledby="popup-heading">
+  <div class="popup-panel opacity-0 translate-y-3 relative w-full max-w-md bg-moss text-cream shadow-float grain overflow-hidden" data-popup-panel>
+    <button class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-cream/10 hover:bg-cream/20 flex items-center justify-center transition-colors duration-200" aria-label="Close" data-popup-close>
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="relative z-10 px-8 py-10 sm:px-10 sm:py-12 text-center">
+      <svg class="w-8 h-8 mx-auto text-champagne" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M20 2 38 20 20 38 2 20Z"/></svg>
+      <h2 id="popup-heading" class="font-display display-tight font-medium text-2xl sm:text-[28px] leading-snug mt-5">Sign up &amp; receive a gift from us on your birthday</h2>
+      <p class="body-relaxed text-cream/75 text-[13.5px] mt-4">Be the first to know about new collections, studio previews, and offers from Aela.</p>
+      <form class="mt-7 text-left" data-popup-form>
+        <label for="popup-email" class="sr-only">Email address</label>
+        <input id="popup-email" type="email" required autocomplete="email" placeholder="Email address"
+          class="block w-full bg-cream/[.08] border border-cream/30 text-cream placeholder:text-cream/45 text-[14px] px-4 py-3 focus:border-champagne focus:outline-none focus:ring-2 focus:ring-champagne/40">
+        <label for="popup-name" class="sr-only">Full name</label>
+        <input id="popup-name" type="text" autocomplete="name" placeholder="Full name"
+          class="block w-full bg-cream/[.08] border border-cream/30 border-t-0 text-cream placeholder:text-cream/45 text-[14px] px-4 py-3 focus:border-champagne focus:outline-none focus:ring-2 focus:ring-champagne/40">
+        <button type="submit" class="btn-gold w-full bg-gold text-cream text-[11.5px] label-wide uppercase font-semibold px-7 py-3.5 mt-4">Join the Community</button>
+        <p class="text-[11px] text-cream/50 mt-3.5 text-center" data-popup-msg>No noise, ever. Unsubscribe anytime.</p>
+      </form>
+    </div>
+  </div>
+</div>
 
-      <!-- imagery: overlapping arch + offset detail -->
-      <div class="lg:col-span-7 relative">
-        <div class="reveal relative ml-auto w-[86%] sm:w-[72%] lg:w-[76%]" style="--d:150ms">
-          <div class="img-treat arch shadow-float">
-            <img class="img-zoom block w-full aspect-[4/5] object-cover" src="https://placehold.co/880x1100/E7E0D5/8A8177?text=Meridian+Collection" alt="Model wearing layered gold necklaces from the Meridian Collection" width="880" height="1100">
-            <div class="img-tint"></div>
-          </div>
-          <svg class="float-slow absolute -top-5 -right-4 w-10 h-10 text-champagne" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M20 2 38 20 20 38 2 20Z"/><path d="M20 11 29 20 20 29 11 20Z"/></svg>
-          <svg class="float-slowest absolute top-1/3 -left-10 w-5 h-5 text-sage/70 hidden md:block" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 2 38 20 20 38 2 20Z"/></svg>
-        </div>
-        <div class="reveal absolute -bottom-8 left-0 sm:left-6 w-[46%] sm:w-[38%] lg:w-[34%]" style="--d:300ms">
-          <div class="img-treat rounded-2xl shadow-lift border-[6px] border-cream group">
-            <img class="img-zoom block w-full aspect-square object-cover" src="https://placehold.co/460x460/E4DCCE/8A8177?text=Signet+Detail" alt="Close-up of a hand wearing the Meridian signet ring" width="460" height="460">
-            <div class="img-tint"></div>
-          </div>
-        </div>
-      </div>
+<main>
+  <!-- ══════════ Hero (full-bleed, editorial) ══════════ -->
+  <section class="relative overflow-hidden h-[78vh] sm:h-[82vh] lg:h-[92vh] min-h-[560px]">
+    <img class="absolute inset-0 w-full h-full object-cover" src="https://placehold.co/1800x2200/2A2622/2A2622?text=+" alt="Close-up detail from the Meridian Collection, gold jewellery on warm stone" width="1800" height="2200">
+    <div class="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-ink/25" aria-hidden="true"></div>
+    <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+      <h1 class="reveal font-display display-tight font-medium text-cream text-[clamp(3rem,9vw,5.5rem)] leading-[1.02]">Meridian</h1>
+      <p class="reveal text-[11px] label-wide uppercase font-semibold text-cream/85 mt-5" style="--d:90ms">Our New Arrival</p>
+      <a href="#collection" class="reveal link-line text-cream text-[12px] label-wide uppercase font-semibold mt-7 py-2" style="--d:160ms">Discover Collection</a>
     </div>
   </section>
 
@@ -293,28 +288,28 @@ tailwind.config = {
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-7">
       <a href="#collection" class="group reveal block" style="--d:0ms">
         <div class="img-treat arch shadow-soft">
-          <img class="img-zoom block w-full aspect-[3/4] object-cover" src="https://placehold.co/560x746/E7E0D5/8A8177?text=Rings" alt="Gold rings arranged on warm stone" width="560" height="746" loading="lazy">
+          <img class="img-zoom block w-full aspect-[3/4] object-cover" src="https://placehold.co/560x746/E7E0D5/E7E0D5?text=+" alt="Gold rings arranged on warm stone" width="560" height="746" loading="lazy">
           <div class="img-tint"></div>
           <span class="absolute bottom-5 left-5 z-10 text-cream font-display text-2xl lg:text-[27px] font-medium tracking-wide">Rings</span>
         </div>
       </a>
       <a href="#collection" class="group reveal block" style="--d:90ms">
         <div class="img-treat arch shadow-soft">
-          <img class="img-zoom block w-full aspect-[3/4] object-cover" src="https://placehold.co/560x746/EAE4D9/8A8177?text=Necklaces" alt="Layered gold necklaces on linen" width="560" height="746" loading="lazy">
+          <img class="img-zoom block w-full aspect-[3/4] object-cover" src="https://placehold.co/560x746/EAE4D9/EAE4D9?text=+" alt="Layered gold necklaces on linen" width="560" height="746" loading="lazy">
           <div class="img-tint"></div>
           <span class="absolute bottom-5 left-5 z-10 text-cream font-display text-2xl lg:text-[27px] font-medium tracking-wide">Necklaces</span>
         </div>
       </a>
       <a href="#collection" class="group reveal block" style="--d:180ms">
         <div class="img-treat arch shadow-soft">
-          <img class="img-zoom block w-full aspect-[3/4] object-cover" src="https://placehold.co/560x746/E4DCCE/8A8177?text=Earrings" alt="Pair of gold hoop earrings" width="560" height="746" loading="lazy">
+          <img class="img-zoom block w-full aspect-[3/4] object-cover" src="https://placehold.co/560x746/E4DCCE/E4DCCE?text=+" alt="Pair of gold hoop earrings" width="560" height="746" loading="lazy">
           <div class="img-tint"></div>
           <span class="absolute bottom-5 left-5 z-10 text-cream font-display text-2xl lg:text-[27px] font-medium tracking-wide">Earrings</span>
         </div>
       </a>
       <a href="#collection" class="group reveal block" style="--d:270ms">
         <div class="img-treat arch shadow-soft">
-          <img class="img-zoom block w-full aspect-[3/4] object-cover" src="https://placehold.co/560x746/EFE9DF/8A8177?text=Bracelets" alt="Gold chain bracelets stacked on a wrist" width="560" height="746" loading="lazy">
+          <img class="img-zoom block w-full aspect-[3/4] object-cover" src="https://placehold.co/560x746/EFE9DF/EFE9DF?text=+" alt="Gold chain bracelets stacked on a wrist" width="560" height="746" loading="lazy">
           <div class="img-tint"></div>
           <span class="absolute bottom-5 left-5 z-10 text-cream font-display text-2xl lg:text-[27px] font-medium tracking-wide">Bracelets</span>
         </div>
@@ -322,336 +317,474 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- ══════════ Featured (tabbed 4-column) ══════════ -->
-  <section id="collection" class="mx-auto max-w-site px-6 lg:px-10 pt-20 lg:pt-28">
-    <h2 class="reveal font-display display-tight font-medium text-4xl lg:text-[44px]">Featured</h2>
-    <div class="reveal flex items-end justify-between gap-6 mt-5 pb-4 border-b border-linen" style="--d:80ms">
-      <div class="flex items-center gap-7 sm:gap-9 overflow-x-auto" role="tablist" aria-label="Featured categories">
-        <button class="text-[11px] label-wide uppercase font-semibold text-ink whitespace-nowrap py-2" data-tab role="tab" aria-selected="true">Earrings</button>
-        <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">Necklaces</button>
-        <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">Rings</button>
-        <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">Bracelets</button>
-      </div>
-      <div class="flex shrink-0">
-        <button class="nav-link w-11 h-11 flex items-center justify-center" data-featured-prev aria-label="Previous category">
-          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6"/></svg>
-        </button>
-        <button class="nav-link w-11 h-11 flex items-center justify-center" data-featured-next aria-label="Next category">
-          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="mt-8">
-      <!-- Earrings -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6" data-tab-panel role="tabpanel">
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Aurelle+Hoops" alt="Aurelle gold hoop earrings on warm card" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Aurelle Hoop Earrings</h3>
-          <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£129</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Vela+Drops" alt="Vela drop earrings in dramatic light" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Vela Drop Earrings</h3>
-          <p class="text-[12px] text-fog mt-0.5">925 Sterling Silver | White Topaz</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£210</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Solstice+Studs" alt="Solstice pearl stud earrings beside a shell" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Solstice Pearl Studs</h3>
-          <p class="text-[12px] text-fog mt-0.5">22k Gold Vermeil | Pearl</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£145</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Isla+Drops" alt="Isla shell drop earrings on sand-toned paper" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Isla Shell Drops</h3>
-          <p class="text-[12px] text-fog mt-0.5">925 Sterling Silver</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£168</p>
-        </a>
-      </div>
-      <!-- Necklaces -->
-      <div class="hidden grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6" data-tab-panel role="tabpanel">
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Solstice+Pendant" alt="Solstice pearl pendant necklace" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Solstice Pearl Pendant</h3>
-          <p class="text-[12px] text-fog mt-0.5">Freshwater Pearl</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£189</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Meridian+Coin" alt="Meridian coin pendant on dark cloth" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Meridian Coin Pendant</h3>
-          <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£240</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Tide+Chain" alt="Tide curb chain necklace" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Tide Curb Chain</h3>
-          <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£205</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Luna+Locket" alt="Luna locket on linen" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Luna Locket</h3>
-          <p class="text-[12px] text-fog mt-0.5">22k Gold Vermeil</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£172</p>
-        </a>
-      </div>
-      <!-- Rings -->
-      <div class="hidden grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6" data-tab-panel role="tabpanel">
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Meridian+Signet" alt="Meridian signet ring in recycled gold" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Meridian Signet Ring</h3>
-          <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£245</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Lumen+Ring" alt="Lumen stacking ring" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Lumen Stacking Ring</h3>
-          <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£98</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Aela+Solitaire" alt="Aela solitaire ring with white topaz" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Aela Solitaire</h3>
-          <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | White Topaz</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£320</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Ember+Band" alt="Ember band ring on warm stone" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Ember Band</h3>
-          <p class="text-[12px] text-fog mt-0.5">22k Gold Vermeil</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£115</p>
-        </a>
-      </div>
-      <!-- Bracelets -->
-      <div class="hidden grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6" data-tab-panel role="tabpanel">
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Tide+Bracelet" alt="Tide chain bracelet in gold" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Tide Chain Bracelet</h3>
-          <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£165</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Cove+Cuff" alt="Cove cuff bracelet in silver" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Cove Cuff</h3>
-          <p class="text-[12px] text-fog mt-0.5">925 Sterling Silver</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£140</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Petra+Beads" alt="Petra pearl bead bracelet" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Petra Bead Bracelet</h3>
-          <p class="text-[12px] text-fog mt-0.5">Freshwater Pearl</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£120</p>
-        </a>
-        <a href="#" class="group block">
-          <div class="overflow-hidden">
-            <img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Halcyon+Bangle" alt="Halcyon bangle in gold vermeil" width="560" height="630" loading="lazy">
-          </div>
-          <h3 class="text-[13px] font-medium mt-4">Halcyon Bangle</h3>
-          <p class="text-[12px] text-fog mt-0.5">22k Gold Vermeil</p>
-          <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£190</p>
-        </a>
-      </div>
-    </div>
+  <!-- ══════════ Brand intro paragraph ══════════ -->
+  <section class="mx-auto max-w-site px-6 lg:px-10 pt-24 lg:pt-32 text-center">
+    <p class="reveal font-display display-tight font-medium text-[clamp(1.5rem,3.4vw,2.3rem)] leading-[1.35] max-w-2xl mx-auto">
+      We craft jewellery that celebrates connections and stories. It's a privilege to offer a vibrant, fully-fledged expression of craftsmanship, individuality, and connection — one piece, one stone, one pair of hands at a time.
+    </p>
+    <a href="#bespoke" class="reveal link-line inline-block text-[12px] label-wide uppercase font-semibold mt-7 py-2" style="--d:120ms">Learn more</a>
   </section>
 
-  <!-- ══════════ Editorial split grid ══════════ -->
-  <section class="mt-24 lg:mt-32">
+  <!-- ══════════ Circular badge ══════════ -->
+  <div class="reveal flex justify-center pt-16 lg:pt-20" style="--d:60ms">
+    <svg viewBox="0 0 220 220" class="w-44 h-44 lg:w-52 lg:h-52 text-moss" aria-hidden="true">
+      <path id="badge-top" fill="none" d="M 20,110 A 90,90 0 0 1 200,110" />
+      <path id="badge-bottom" fill="none" d="M 200,110 A 90,90 0 0 1 20,110" />
+      <text class="fill-current text-[13.5px] label-wide uppercase font-medium" style="font-family: 'Montserrat', sans-serif;">
+        <textPath href="#badge-top" startOffset="50%" text-anchor="middle">Aela Jewels</textPath>
+      </text>
+      <text class="fill-current text-[13.5px] label-wide uppercase font-medium" style="font-family: 'Montserrat', sans-serif;">
+        <textPath href="#badge-bottom" startOffset="50%" text-anchor="middle">Slow Made, By Hand</textPath>
+      </text>
+      <line x1="42" y1="60" x2="36" y2="52" stroke="currentColor" stroke-width="1"/>
+      <line x1="178" y1="60" x2="184" y2="52" stroke="currentColor" stroke-width="1"/>
+      <g transform="translate(110,110)">
+        <path d="M0 -22 22 0 0 22 -22 0Z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M0 -11 11 0 0 11 -11 0Z" fill="currentColor" opacity=".12"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ══════════ Gift Sets (full-bleed) ══════════ -->
+  <section class="mt-16 lg:mt-20">
+    <a href="#collection" class="group relative block overflow-hidden h-[22rem] lg:h-[30rem]">
+      <img class="img-zoom absolute inset-0 w-full h-full object-cover" src="https://placehold.co/1800x1000/2E2A24/2E2A24?text=+" alt="Gold necklace and shell styled on dark fabric" loading="lazy">
+      <div class="absolute inset-0 bg-ink/30" aria-hidden="true"></div>
+      <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+        <h2 class="font-display display-tight font-medium text-cream text-4xl lg:text-[46px]">Gift Sets</h2>
+        <span class="link-line text-cream text-[11px] label-wide uppercase font-semibold mt-4 py-1">Shop Guides</span>
+      </div>
+    </a>
+  </section>
+
+  <!-- ══════════ Love & Engagement (tabbed carousel) ══════════ -->
+  <section id="love-engagement" class="mx-auto max-w-site px-6 lg:px-10 pt-20 lg:pt-28">
+    <h2 class="reveal font-display display-tight font-medium text-4xl lg:text-[44px]">Love &amp; Engagement</h2>
+    <p class="reveal body-relaxed text-stone text-[14.5px] mt-5 max-w-lg" style="--d:60ms">
+      You define your own vibe and we create designs to celebrate it. Our collection has evolved as the definition of love is personal to each of us.
+    </p>
+
+    <div class="mt-8" data-tabgroup>
+      <div class="reveal flex items-end justify-between gap-6 pb-4 border-b border-linen" style="--d:100ms">
+        <div class="flex items-center gap-6 sm:gap-8 overflow-x-auto" role="tablist" aria-label="Love and engagement categories">
+          <button class="text-[11px] label-wide uppercase font-semibold text-ink whitespace-nowrap py-2" data-tab role="tab" aria-selected="true">Engagement Rings</button>
+          <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">Wedding Bands</button>
+          <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">One of a Kind</button>
+          <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">Mens Bands</button>
+        </div>
+        <div class="flex shrink-0">
+          <button class="nav-link w-11 h-11 flex items-center justify-center" data-tab-prev aria-label="Previous category">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6"/></svg>
+          </button>
+          <button class="nav-link w-11 h-11 flex items-center justify-center" data-tab-next aria-label="Next category">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <!-- Engagement Rings -->
+        <div class="snap-row flex gap-5 lg:gap-6 overflow-x-auto pb-2" data-tab-panel role="tabpanel">
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/EDEAE6/6E5D4B?text=Meridian+Solitaire" alt="Meridian solitaire engagement ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Meridian Solitaire</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | Lab Diamond 1.0ct</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£1,850</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Aela+Bezel" alt="Aela bezel engagement ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Aela Bezel Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | White Topaz</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£420</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Halo+Edit" alt="Halo Edit engagement ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Halo Edit Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">18k Yellow Gold | Lab Diamond 0.8ct</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£1,420</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/6E5D4B/D8C6AF?text=Ember+Halo" alt="Ember Halo engagement ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Ember Halo Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">9ct Gold | Morganite</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£680</p>
+          </a>
+        </div>
+        <!-- Wedding Bands -->
+        <div class="hidden snap-row flex gap-5 lg:gap-6 overflow-x-auto pb-2" data-tab-panel role="tabpanel">
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Tide+Band" alt="Tide wedding band" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Tide Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | 2mm</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£245</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Horizon+Band" alt="Horizon wedding band" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Horizon Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">18k Yellow Gold | 3mm</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£560</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Fine+Court" alt="Fine court wedding band" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Fine Court Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | 1.5mm</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£198</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Petal+Band" alt="Petal wedding band" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Petal Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | 2.5mm</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£215</p>
+          </a>
+        </div>
+        <!-- One of a Kind -->
+        <div class="hidden snap-row flex gap-5 lg:gap-6 overflow-x-auto pb-2" data-tab-panel role="tabpanel">
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/6E5D4B/D8C6AF?text=Wildcard+Ring" alt="Wildcard one of a kind ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Wildcard Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">Reclaimed Gold | Sapphire, one-of-one</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£980</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Salt+Ring" alt="Salt one of a kind ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Salt Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">Reclaimed Gold | Rose Quartz, one-of-one</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£640</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Ember+Knot" alt="Ember Knot one of a kind ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Ember Knot Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">18k Gold | Garnet, one-of-one</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£710</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Driftwood" alt="Driftwood one of a kind ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Driftwood Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">Reclaimed Gold | Aquamarine, one-of-one</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£590</p>
+          </a>
+        </div>
+        <!-- Mens Bands -->
+        <div class="hidden snap-row flex gap-5 lg:gap-6 overflow-x-auto pb-2" data-tab-panel role="tabpanel">
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Anchor+Band" alt="Anchor mens band" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Anchor Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | 4mm</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£480</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Forge+Band" alt="Forge mens band" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Forge Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">Brushed 18k Gold | 5mm</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£650</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Slate+Band" alt="Slate mens band" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Slate Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">925 Sterling Silver | 5mm</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£220</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Meridian+Band" alt="Meridian mens band" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Meridian Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | 6mm</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£520</p>
+          </a>
+        </div>
+      </div>
+    </div>
+    <a href="#" class="reveal link-line inline-block text-[12px] label-wide uppercase font-semibold mt-8 py-2" style="--d:60ms">Explore collection</a>
+  </section>
+
+  <!-- ══════════ Shop the look (hotspot) ══════════ -->
+  <section class="mx-auto max-w-site px-6 lg:px-10 pt-20 lg:pt-28 text-center">
+    <h2 class="reveal font-display display-tight font-medium text-4xl lg:text-[44px]">Shop the look</h2>
+    <div class="reveal relative max-w-xl mx-auto mt-9 shadow-soft" style="--d:80ms">
+      <img class="block w-full aspect-[4/5] object-cover" src="https://placehold.co/900x1125/D8CBB8/D8CBB8?text=+" alt="Hand wearing stacked gold rings" width="900" height="1125" loading="lazy">
+      <a href="#love-engagement" class="absolute top-[42%] left-[36%] -translate-x-1/2 -translate-y-1/2 flex items-center justify-center" aria-label="Shop Wildcard Ring, £980">
+        <span class="absolute w-8 h-8 rounded-full bg-cream/70 animate-ping" aria-hidden="true"></span>
+        <span class="relative w-4 h-4 rounded-full bg-cream border border-ink/20 shadow-soft"></span>
+      </a>
+      <a href="#collection" class="absolute top-[63%] left-[59%] -translate-x-1/2 -translate-y-1/2 flex items-center justify-center" aria-label="Shop Lumen Stacking Ring, £98">
+        <span class="absolute w-8 h-8 rounded-full bg-cream/70 animate-ping" aria-hidden="true" style="animation-delay: -1.2s;"></span>
+        <span class="relative w-4 h-4 rounded-full bg-cream border border-ink/20 shadow-soft"></span>
+      </a>
+    </div>
+    <a href="#love-engagement" class="reveal link-line inline-block text-[12px] label-wide uppercase font-semibold mt-8 py-2" style="--d:140ms">View products</a>
+  </section>
+
+  <!-- ══════════ Featured (tabbed carousel) ══════════ -->
+  <section id="collection" class="mx-auto max-w-site px-6 lg:px-10 pt-20 lg:pt-28">
+    <h2 class="reveal font-display display-tight font-medium text-4xl lg:text-[44px]">Featured</h2>
+    <div class="mt-5" data-tabgroup>
+      <div class="reveal flex items-end justify-between gap-6 pb-4 border-b border-linen" style="--d:80ms">
+        <div class="flex items-center gap-7 sm:gap-9 overflow-x-auto" role="tablist" aria-label="Featured categories">
+          <button class="text-[11px] label-wide uppercase font-semibold text-ink whitespace-nowrap py-2" data-tab role="tab" aria-selected="true">Earrings</button>
+          <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">Necklaces</button>
+          <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">Rings</button>
+          <button class="nav-link text-[11px] label-wide uppercase font-semibold text-fog whitespace-nowrap py-2" data-tab role="tab" aria-selected="false">Bracelets</button>
+        </div>
+        <div class="flex shrink-0">
+          <button class="nav-link w-11 h-11 flex items-center justify-center" data-tab-prev aria-label="Previous category">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6"/></svg>
+          </button>
+          <button class="nav-link w-11 h-11 flex items-center justify-center" data-tab-next aria-label="Next category">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <!-- Earrings -->
+        <div class="snap-row flex gap-5 lg:gap-6 overflow-x-auto pb-2" data-tab-panel role="tabpanel">
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Aurelle+Hoops" alt="Aurelle gold hoop earrings on warm card" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Aurelle Hoop Earrings</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£129</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Vela+Drops" alt="Vela drop earrings in dramatic light" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Vela Drop Earrings</h3>
+            <p class="text-[12px] text-fog mt-0.5">925 Sterling Silver | White Topaz</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£210</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Solstice+Studs" alt="Solstice pearl stud earrings beside a shell" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Solstice Pearl Studs</h3>
+            <p class="text-[12px] text-fog mt-0.5">22k Gold Vermeil | Pearl</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£145</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Isla+Drops" alt="Isla shell drop earrings on sand-toned paper" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Isla Shell Drops</h3>
+            <p class="text-[12px] text-fog mt-0.5">925 Sterling Silver</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£168</p>
+          </a>
+        </div>
+        <!-- Necklaces -->
+        <div class="hidden snap-row flex gap-5 lg:gap-6 overflow-x-auto pb-2" data-tab-panel role="tabpanel">
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Solstice+Pendant" alt="Solstice pearl pendant necklace" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Solstice Pearl Pendant</h3>
+            <p class="text-[12px] text-fog mt-0.5">Freshwater Pearl</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£189</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Meridian+Coin" alt="Meridian coin pendant on dark cloth" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Meridian Coin Pendant</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£240</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Tide+Chain" alt="Tide curb chain necklace" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Tide Curb Chain</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£205</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Luna+Locket" alt="Luna locket on linen" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Luna Locket</h3>
+            <p class="text-[12px] text-fog mt-0.5">22k Gold Vermeil</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£172</p>
+          </a>
+        </div>
+        <!-- Rings -->
+        <div class="hidden snap-row flex gap-5 lg:gap-6 overflow-x-auto pb-2" data-tab-panel role="tabpanel">
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Meridian+Signet" alt="Meridian signet ring in recycled gold" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Meridian Signet Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£245</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Lumen+Ring" alt="Lumen stacking ring" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Lumen Stacking Ring</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£98</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Aela+Everyday" alt="Aela everyday solitaire ring with white topaz" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Aela Everyday Solitaire</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold | White Topaz</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£320</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Ember+Band" alt="Ember band ring on warm stone" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Ember Band</h3>
+            <p class="text-[12px] text-fog mt-0.5">22k Gold Vermeil</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£115</p>
+          </a>
+        </div>
+        <!-- Bracelets -->
+        <div class="hidden snap-row flex gap-5 lg:gap-6 overflow-x-auto pb-2" data-tab-panel role="tabpanel">
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/C9B29A/6E5D4B?text=Tide+Bracelet" alt="Tide chain bracelet in gold" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Tide Chain Bracelet</h3>
+            <p class="text-[12px] text-fog mt-0.5">Recycled 9ct Gold</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£165</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/4A4036/D8C6AF?text=Cove+Cuff" alt="Cove cuff bracelet in silver" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Cove Cuff</h3>
+            <p class="text-[12px] text-fog mt-0.5">925 Sterling Silver</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£140</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/D8C6AF/7A6A57?text=Petra+Beads" alt="Petra pearl bead bracelet" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Petra Bead Bracelet</h3>
+            <p class="text-[12px] text-fog mt-0.5">Freshwater Pearl</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£120</p>
+          </a>
+          <a href="#" class="group block shrink-0 w-[68%] sm:w-[38%] lg:w-[23%]">
+            <div class="overflow-hidden"><img class="img-zoom block w-full aspect-[8/9] object-cover" src="https://placehold.co/560x630/BFA98E/6E5D4B?text=Halcyon+Bangle" alt="Halcyon bangle in gold vermeil" width="560" height="630" loading="lazy"></div>
+            <h3 class="text-[13px] font-medium mt-4">Halcyon Bangle</h3>
+            <p class="text-[12px] text-fog mt-0.5">22k Gold Vermeil</p>
+            <p class="text-[12.5px] text-stone font-medium tabular-nums mt-1.5">£190</p>
+          </a>
+        </div>
+      </div>
+    </div>
+    <a href="#" class="reveal link-line inline-block text-[12px] label-wide uppercase font-semibold mt-8 py-2" style="--d:60ms">View all</a>
+  </section>
+
+  <!-- ══════════ Gift Guides + Engagement Rings pair ══════════ -->
+  <section class="mt-20 lg:mt-28">
     <div class="grid md:grid-cols-2">
-      <a href="#categories" class="group relative block overflow-hidden h-[24rem] lg:h-[32rem]">
-        <img class="img-zoom absolute inset-0 w-full h-full object-cover" src="https://placehold.co/1400x900/40382F/40382F?text=+" alt="Gold coin pendants hanging against dark cloth" loading="lazy">
+      <a href="#" class="group relative block overflow-hidden h-[22rem] lg:h-[30rem]">
+        <img class="img-zoom absolute inset-0 w-full h-full object-cover" src="https://placehold.co/1400x900/2E2A24/2E2A24?text=+" alt="Gold coin pendants hanging against dark cloth" loading="lazy">
         <div class="absolute inset-0 bg-ink/25" aria-hidden="true"></div>
         <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
           <h3 class="font-display display-tight font-medium text-cream text-4xl lg:text-[42px]">Gift Guides</h3>
           <span class="link-line text-cream text-[11px] label-wide uppercase font-semibold mt-4 py-1">Shop Guides</span>
         </div>
       </a>
-      <a href="#collection" class="group relative block overflow-hidden h-[24rem] lg:h-[32rem]">
+      <a href="#love-engagement" class="group relative block overflow-hidden h-[22rem] lg:h-[30rem]">
         <img class="img-zoom absolute inset-0 w-full h-full object-cover" src="https://placehold.co/1400x900/EDEAE6/EDEAE6?text=+" alt="Three engagement rings on a pale ground" loading="lazy">
         <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
           <h3 class="font-display display-tight font-medium text-ink text-4xl lg:text-[42px]">Engagement Rings</h3>
           <span class="link-line text-ink text-[11px] label-wide uppercase font-semibold mt-4 py-1">Explore Collection</span>
         </div>
       </a>
-      <div class="group relative overflow-hidden h-[24rem] lg:h-[32rem]">
-        <img class="img-zoom absolute inset-0 w-full h-full object-cover" src="https://placehold.co/1400x900/C9B29A/7A6A57?text=At+the+Bench" alt="Hands wearing layered bracelets at the studio bench" loading="lazy">
-      </div>
-      <a href="#love-notes" class="group bg-moss h-[24rem] lg:h-[32rem] flex flex-col items-center justify-center text-center px-6">
-        <p class="text-[11px] label-wide uppercase font-semibold text-champagne">Love Notes</p>
-        <h3 class="font-display display-tight font-medium text-cream text-3xl lg:text-4xl mt-4 max-w-sm">Kind words from the people who keep them</h3>
-        <span class="link-line text-cream text-[11px] label-wide uppercase font-semibold mt-6 py-1">Read Their Stories</span>
-      </a>
     </div>
   </section>
 
-  <!-- ══════════ Brand story ══════════ -->
-  <section id="story" class="relative mt-24 lg:mt-32 bg-moss text-cream grain overflow-hidden">
-    <div class="mx-auto max-w-site px-6 lg:px-10 py-20 lg:py-28 grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
-      <div class="lg:col-span-5 relative">
-        <div class="reveal relative w-[88%]">
-          <div class="absolute -top-5 -left-5 w-full h-full border-[1.5px] border-gold/70 rounded-2xl" aria-hidden="true"></div>
-          <svg class="float-slow absolute -right-7 -top-8 w-6 h-6 text-champagne/70 hidden lg:block" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 2 38 20 20 38 2 20Z"/></svg>
-          <div class="img-treat rounded-2xl shadow-lift group relative">
-            <img class="img-zoom block w-full aspect-[4/5] object-cover" src="https://placehold.co/640x800/E4DCCE/8A8177?text=The+Studio" alt="Jeweller setting a stone at the Aela studio bench" width="640" height="800" loading="lazy">
-            <div class="img-tint"></div>
-          </div>
-        </div>
-      </div>
-      <div class="lg:col-span-6 lg:col-start-7">
-        <p class="reveal text-[11px] label-wide uppercase font-semibold text-champagne">Our World</p>
-        <blockquote class="reveal font-display display-tight font-medium text-cream text-[clamp(1.9rem,4vw,3rem)] leading-[1.15] mt-5" style="--d:90ms">
-          “We make jewellery the slow way — <em class="italic font-normal text-champagne">one stone, one setting, one pair of hands</em> at a time.”
-        </blockquote>
-        <p class="reveal body-relaxed text-cream/75 text-[15px] mt-7 max-w-lg" style="--d:180ms">
-          Founded at a single workbench, Aela Jewels began with a simple belief: the
-          pieces that mark our lives should be made with the same care they’ll be kept.
-          Every design is cast from recycled gold, set with traceable stones, and
-          finished by hand in our studio.
-        </p>
-        <a href="#" class="reveal link-line inline-flex items-center gap-2.5 text-[12px] label-wide uppercase font-semibold text-cream mt-9 py-2" style="--d:270ms">
-          Discover Our World
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-        </a>
-      </div>
+  <!-- ══════════ Bespoke Service (full-bleed) ══════════ -->
+  <section id="bespoke" class="relative overflow-hidden h-[26rem] lg:h-[34rem]">
+    <img class="absolute inset-0 w-full h-full object-cover" src="https://placehold.co/1800x1200/8A7B68/8A7B68?text=+" alt="Hands setting a stone at the jeweller's bench" loading="lazy">
+    <div class="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/20 to-transparent" aria-hidden="true"></div>
+    <div class="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+      <h2 class="font-display display-tight font-medium text-cream text-4xl lg:text-[46px]">Bespoke Service</h2>
+      <p class="body-relaxed text-cream/80 text-[14px] mt-4 max-w-sm">By appointment, in our studio or remotely — we design a piece that's entirely yours.</p>
+      <span class="link-line text-cream text-[11px] label-wide uppercase font-semibold mt-6 py-1">Learn more</span>
     </div>
   </section>
 
-  <!-- ══════════ Love notes (testimonials) ══════════ -->
-  <section id="love-notes" class="mx-auto max-w-site px-6 lg:px-10 py-20 lg:py-28 text-center">
-    <p class="reveal text-[11px] label-wide uppercase font-semibold text-gold">Love Notes</p>
-    <div class="reveal relative max-w-3xl mx-auto mt-4 min-h-[19rem] sm:min-h-[13rem]" style="--d:90ms" aria-live="polite">
-      <figure class="quote-slide absolute inset-0 opacity-100" data-quote>
-        <div class="flex justify-center gap-1.5 text-gold mb-6" aria-label="5 out of 5 stars">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-        </div>
-        <blockquote class="font-display display-tight text-[clamp(1.5rem,3vw,2.2rem)] leading-snug font-medium">“My engagement ring is more beautiful than anything I could have imagined. It feels like it was always meant to be mine.”</blockquote>
-        <figcaption class="text-[11px] label-wide uppercase font-semibold text-fog mt-6">Amara — London</figcaption>
-      </figure>
-      <figure class="quote-slide absolute inset-0 opacity-0 translate-y-3 pointer-events-none" data-quote>
-        <div class="flex justify-center gap-1.5 text-gold mb-6" aria-label="5 out of 5 stars">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-        </div>
-        <blockquote class="font-display display-tight text-[clamp(1.5rem,3vw,2.2rem)] leading-snug font-medium">“Beautifully wrapped, thoughtfully made. The signet I bought for my sister made her cry — happy tears.”</blockquote>
-        <figcaption class="text-[11px] label-wide uppercase font-semibold text-fog mt-6">Noor — Amsterdam</figcaption>
-      </figure>
-      <figure class="quote-slide absolute inset-0 opacity-0 translate-y-3 pointer-events-none" data-quote>
-        <div class="flex justify-center gap-1.5 text-gold mb-6" aria-label="5 out of 5 stars">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8Z"/></svg>
-        </div>
-        <blockquote class="font-display display-tight text-[clamp(1.5rem,3vw,2.2rem)] leading-snug font-medium">“I wear my Lumen ring every single day. Three years on, it still looks exactly as it did in the box.”</blockquote>
-        <figcaption class="text-[11px] label-wide uppercase font-semibold text-fog mt-6">Elise — Wellington</figcaption>
-      </figure>
-    </div>
-    <div class="reveal flex justify-center gap-3 mt-8" style="--d:180ms">
-      <button class="w-11 h-11 flex items-center justify-center group" data-quote-dot aria-label="Show testimonial 1">
-        <span class="block w-2 h-2 rotate-45 bg-gold transition-opacity duration-200" aria-hidden="true"></span>
-      </button>
-      <button class="w-11 h-11 flex items-center justify-center group" data-quote-dot aria-label="Show testimonial 2">
-        <span class="block w-2 h-2 rotate-45 bg-ink/20 transition-opacity duration-200" aria-hidden="true"></span>
-      </button>
-      <button class="w-11 h-11 flex items-center justify-center group" data-quote-dot aria-label="Show testimonial 3">
-        <span class="block w-2 h-2 rotate-45 bg-ink/20 transition-opacity duration-200" aria-hidden="true"></span>
-      </button>
+  <!-- ══════════ Love Notes (dark testimonial) ══════════ -->
+  <section id="love-notes" class="relative bg-moss text-cream grain overflow-hidden">
+    <div class="mx-auto max-w-site px-6 lg:px-10 py-20 lg:py-28 text-center">
+      <p class="reveal text-[11px] label-wide uppercase font-semibold text-champagne">Love Notes</p>
+      <div class="reveal relative max-w-2xl mx-auto mt-6 min-h-[15rem] sm:min-h-[11rem]" style="--d:90ms" aria-live="polite">
+        <figure class="quote-slide absolute inset-0 opacity-100" data-quote>
+          <blockquote class="font-display display-tight text-[clamp(1.6rem,3.6vw,2.4rem)] leading-snug font-medium">"It feels like it was always meant to be mine."</blockquote>
+          <p class="body-relaxed text-cream/70 text-[14px] mt-5 max-w-lg mx-auto">My engagement ring is more beautiful than anything I could have imagined. Every detail, exactly as we designed it together.</p>
+          <figcaption class="text-[11px] label-wide uppercase font-semibold text-cream/55 mt-6">— Amara, London</figcaption>
+        </figure>
+        <figure class="quote-slide absolute inset-0 opacity-0 translate-y-3 pointer-events-none" data-quote>
+          <blockquote class="font-display display-tight text-[clamp(1.6rem,3.6vw,2.4rem)] leading-snug font-medium">"Happy tears, the good kind."</blockquote>
+          <p class="body-relaxed text-cream/70 text-[14px] mt-5 max-w-lg mx-auto">Beautifully wrapped, thoughtfully made. The signet I bought for my sister made her cry — happy tears.</p>
+          <figcaption class="text-[11px] label-wide uppercase font-semibold text-cream/55 mt-6">— Noor, Amsterdam</figcaption>
+        </figure>
+        <figure class="quote-slide absolute inset-0 opacity-0 translate-y-3 pointer-events-none" data-quote>
+          <blockquote class="font-display display-tight text-[clamp(1.6rem,3.6vw,2.4rem)] leading-snug font-medium">"Three years on, still flawless."</blockquote>
+          <p class="body-relaxed text-cream/70 text-[14px] mt-5 max-w-lg mx-auto">I wear my Lumen ring every single day. Three years on, it still looks exactly as it did in the box.</p>
+          <figcaption class="text-[11px] label-wide uppercase font-semibold text-cream/55 mt-6">— Elise, Wellington</figcaption>
+        </figure>
+      </div>
+      <div class="reveal flex justify-center items-center gap-6 mt-9" style="--d:160ms">
+        <button class="nav-link w-11 h-11 flex items-center justify-center" data-quote-prev aria-label="Previous testimonial">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6"/></svg>
+        </button>
+        <button class="nav-link w-11 h-11 flex items-center justify-center" data-quote-next aria-label="Next testimonial">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
+        </button>
+      </div>
     </div>
   </section>
 
   <!-- ══════════ Journal ══════════ -->
-  <section class="mx-auto max-w-site px-6 lg:px-10 pb-24 lg:pb-32">
-    <div class="flex items-end justify-between gap-6 mb-11">
-      <div>
-        <p class="reveal text-[11px] label-wide uppercase font-semibold text-gold">The Journal</p>
-        <h2 class="reveal font-display display-tight font-medium text-4xl lg:text-5xl mt-3" style="--d:80ms">Stories from the bench</h2>
+  <section id="journal" class="mx-auto max-w-site px-6 lg:px-10 py-20 lg:py-28">
+    <p class="reveal font-display display-tight font-medium text-[clamp(1.4rem,3vw,2rem)] leading-[1.4] max-w-xl">
+      Discover the stories behind each collection, styling notes from our team, and the latest happenings at Aela Jewels.
+    </p>
+    <a href="#" class="reveal link-line inline-block text-[12px] label-wide uppercase font-semibold mt-5 py-2" style="--d:70ms">Read our Journal</a>
+
+    <a href="#" class="group reveal grid sm:grid-cols-2 gap-7 lg:gap-10 items-center mt-16" style="--d:120ms">
+      <div class="img-treat rounded-xl shadow-soft order-1">
+        <img class="img-zoom block w-full aspect-[3/2] object-cover" src="https://placehold.co/800x533/E7E0D5/8A8177?text=Meridian+Story" alt="Sketches and wax models for the Meridian collection" width="800" height="533" loading="lazy">
+        <div class="img-tint"></div>
       </div>
-      <a href="#" class="reveal link-line hidden md:inline-block text-[12px] label-wide uppercase font-semibold pb-1 shrink-0" style="--d:140ms">All Stories</a>
+      <div class="order-2">
+        <p class="text-[10.5px] label-wide uppercase font-semibold text-moss">Collections — 04 July 2026</p>
+        <h3 class="font-display display-tight text-[30px] font-medium leading-tight mt-3 group-hover:text-golddeep transition-colors duration-200">The story behind the Meridian Collection</h3>
+        <p class="body-relaxed text-stone text-[14px] mt-4 max-w-md">Named for the line that holds a compass true, Meridian began as a handful of sketches at the studio bench — a study in warm gold and quiet, considered form. Here's how it came to be.</p>
+        <span class="link-line inline-block text-[12px] label-wide uppercase font-semibold mt-5 py-1">Read more</span>
+      </div>
+    </a>
+  </section>
+
+  <!-- ══════════ Our Studio ══════════ -->
+  <section class="mx-auto max-w-site px-6 lg:px-10 pb-20 lg:pb-28">
+    <div class="flex items-end justify-between gap-6 mb-9 border-b border-linen pb-5">
+      <h2 class="reveal font-display display-tight font-medium text-4xl lg:text-[44px]">Our Studio</h2>
     </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-      <a href="#" class="group reveal block">
-        <div class="img-treat rounded-xl shadow-soft">
-          <img class="img-zoom block w-full aspect-[3/2] object-cover" src="https://placehold.co/640x426/E7E0D5/8A8177?text=Meridian+Story" alt="Sketches and wax models for the Meridian collection" width="640" height="426" loading="lazy">
-          <div class="img-tint"></div>
-        </div>
-        <p class="text-[10.5px] label-wide uppercase font-semibold text-moss mt-5">Collections — 04 July 2026</p>
-        <h3 class="font-display display-tight text-[25px] font-medium leading-tight mt-2 group-hover:text-golddeep transition-colors duration-200">The story behind the Meridian Collection</h3>
-      </a>
-      <a href="#" class="group reveal block" style="--d:100ms">
-        <div class="img-treat rounded-xl shadow-soft">
-          <img class="img-zoom block w-full aspect-[3/2] object-cover" src="https://placehold.co/640x426/EAE4D9/8A8177?text=Layering+Guide" alt="Model wearing three layered necklaces of varying lengths" width="640" height="426" loading="lazy">
-          <div class="img-tint"></div>
-        </div>
-        <p class="text-[10.5px] label-wide uppercase font-semibold text-moss mt-5">Styling — 18 June 2026</p>
-        <h3 class="font-display display-tight text-[25px] font-medium leading-tight mt-2 group-hover:text-golddeep transition-colors duration-200">A quiet art: how to layer your necklaces</h3>
-      </a>
-      <a href="#" class="group reveal block sm:col-span-2 lg:col-span-1" style="--d:200ms">
-        <div class="img-treat rounded-xl shadow-soft">
-          <img class="img-zoom block w-full aspect-[3/2] object-cover" src="https://placehold.co/640x426/E4DCCE/8A8177?text=Gold+Care" alt="Polishing cloth and gold rings on a jeweller's bench" width="640" height="426" loading="lazy">
-          <div class="img-tint"></div>
-        </div>
-        <p class="text-[10.5px] label-wide uppercase font-semibold text-moss mt-5">Care — 02 June 2026</p>
-        <h3 class="font-display display-tight text-[25px] font-medium leading-tight mt-2 group-hover:text-golddeep transition-colors duration-200">Caring for recycled gold, for good</h3>
-      </a>
+    <div class="reveal max-w-sm" style="--d:60ms">
+      <h3 class="font-display display-tight text-2xl font-medium">The Aela Studio</h3>
+      <address class="not-italic body-relaxed text-stone text-[14.5px] mt-3">
+        14 Goldsmith Row, London<br>E2 8QA, United Kingdom
+      </address>
+      <p class="text-[13px] text-fog mt-2">By appointment only</p>
+      <div class="flex items-center gap-6 mt-5 text-[12px] label-wide uppercase font-semibold">
+        <a class="link-line py-1" href="https://www.google.com/maps/search/?api=1&query=14+Goldsmith+Row+London+E2+8QA" target="_blank" rel="noopener">View map</a>
+        <a class="link-line py-1" href="#">Book an appointment</a>
+      </div>
     </div>
   </section>
 
-  <!-- ══════════ Newsletter ══════════ -->
+  <!-- ══════════ Join our Community (newsletter) ══════════ -->
   <section class="relative bg-ink text-cream grain overflow-hidden">
     <div class="newsletter-atmos absolute inset-0" aria-hidden="true"></div>
-    <div class="mx-auto max-w-site px-6 lg:px-10 py-20 lg:py-24 text-center relative z-10">
-      <div class="reveal">
-        <svg class="float-slow w-9 h-9 mx-auto text-sage" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M20 2 38 20 20 38 2 20Z"/><path d="M20 11 29 20 20 29 11 20Z"/></svg>
+    <div class="mx-auto max-w-site px-6 lg:px-10 py-20 lg:py-24 relative z-10">
+      <div class="max-w-md mx-auto text-center">
+        <div class="reveal">
+          <svg class="float-slow w-9 h-9 mx-auto text-sage" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M20 2 38 20 20 38 2 20Z"/><path d="M20 11 29 20 20 29 11 20Z"/></svg>
+        </div>
+        <h2 class="reveal font-display display-tight font-medium text-4xl lg:text-[44px] mt-6" style="--d:90ms">Join our Community</h2>
+        <p class="reveal body-relaxed text-cream/70 text-[14.5px] mt-4" style="--d:160ms">
+          Receive 10% off your next order. Sign up for updates on new collections, private previews, and a gift on your birthday.
+        </p>
       </div>
-      <h2 class="reveal font-display display-tight font-medium text-4xl lg:text-[44px] mt-6" style="--d:90ms">First to know, always</h2>
-      <p class="reveal body-relaxed text-cream/70 text-[14.5px] mt-4 max-w-md mx-auto" style="--d:160ms">
-        New collections, studio stories and private previews — a letter from the bench, once a month.
-      </p>
       <form class="reveal max-w-md mx-auto mt-9 text-left" style="--d:230ms" data-newsletter>
-        <label for="newsletter-email" class="block text-[10.5px] label-wide uppercase font-semibold text-cream/80 mb-2.5">Email address</label>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="nl-first" class="block text-[10.5px] label-wide uppercase font-semibold text-cream/80 mb-2.5">First Name</label>
+            <input id="nl-first" name="first_name" type="text" autocomplete="given-name" required
+              class="w-full bg-cream/[.07] border border-cream/30 text-cream text-[14px] px-4 py-3 focus:border-champagne focus:outline-none focus:ring-2 focus:ring-champagne/40">
+          </div>
+          <div>
+            <label for="nl-last" class="block text-[10.5px] label-wide uppercase font-semibold text-cream/80 mb-2.5">Last Name</label>
+            <input id="nl-last" name="last_name" type="text" autocomplete="family-name" required
+              class="w-full bg-cream/[.07] border border-cream/30 text-cream text-[14px] px-4 py-3 focus:border-champagne focus:outline-none focus:ring-2 focus:ring-champagne/40">
+          </div>
+        </div>
+        <label for="nl-dob" class="block text-[10.5px] label-wide uppercase font-semibold text-cream/80 mb-2.5 mt-4">Birthday (DD/MM)</label>
+        <input id="nl-dob" name="birthday" type="text" placeholder="DD/MM" inputmode="numeric"
+          class="w-full bg-cream/[.07] border border-cream/30 text-cream placeholder:text-cream/40 text-[14px] px-4 py-3 focus:border-champagne focus:outline-none focus:ring-2 focus:ring-champagne/40">
+        <label for="newsletter-email" class="block text-[10.5px] label-wide uppercase font-semibold text-cream/80 mb-2.5 mt-4">Email address</label>
         <div class="flex">
           <input id="newsletter-email" name="email" type="email" required autocomplete="email" placeholder="you@example.com"
             class="flex-1 min-w-0 bg-cream/[.07] border border-cream/30 text-cream placeholder:text-cream/40 text-[14px] px-5 py-3.5 focus:border-champagne focus:outline-none focus:ring-2 focus:ring-champagne/40">
-          <button type="submit" class="btn-gold bg-gold text-cream text-[11.5px] label-wide uppercase font-semibold px-7 py-3.5 shrink-0">Sign Up</button>
+          <button type="submit" class="btn-gold bg-gold text-cream text-[11.5px] label-wide uppercase font-semibold px-7 py-3.5 shrink-0">Join</button>
         </div>
         <p class="text-[11.5px] text-cream/50 mt-3.5" data-newsletter-msg>No noise, ever. Unsubscribe anytime.</p>
       </form>
@@ -684,47 +817,45 @@ tailwind.config = {
           batches at our studio.
         </p>
       </div>
-      <nav class="lg:col-span-2 lg:col-start-6" aria-label="Shop">
+      <nav class="lg:col-span-2 lg:col-start-5" aria-label="Shop">
         <h3 class="text-[10.5px] label-wide uppercase font-semibold text-fog">Shop</h3>
         <ul class="mt-5 space-y-3 text-[13.5px] font-medium">
-          <li><a class="link-line" href="#collection">New In</a></li>
-          <li><a class="link-line" href="#categories">Rings</a></li>
-          <li><a class="link-line" href="#categories">Necklaces</a></li>
-          <li><a class="link-line" href="#categories">Earrings</a></li>
-          <li><a class="link-line" href="#categories">Bracelets</a></li>
+          <li><a class="link-line" href="#collection">Rings</a></li>
+          <li><a class="link-line" href="#collection">Necklaces</a></li>
+          <li><a class="link-line" href="#collection">Earrings</a></li>
+          <li><a class="link-line" href="#collection">Bracelets</a></li>
+          <li><a class="link-line" href="#love-engagement">Engagement &amp; Wedding</a></li>
         </ul>
       </nav>
-      <nav class="lg:col-span-2" aria-label="Our world">
-        <h3 class="text-[10.5px] label-wide uppercase font-semibold text-fog">Our World</h3>
+      <nav class="lg:col-span-2" aria-label="Get in touch">
+        <h3 class="text-[10.5px] label-wide uppercase font-semibold text-fog">Get In Touch</h3>
         <ul class="mt-5 space-y-3 text-[13.5px] font-medium">
-          <li><a class="link-line" href="#story">Our Story</a></li>
-          <li><a class="link-line" href="#">The Journal</a></li>
-          <li><a class="link-line" href="#">Responsibility</a></li>
+          <li><a class="link-line" href="#">Contact Us</a></li>
+          <li><a class="link-line" href="#bespoke">Bespoke Service</a></li>
           <li><a class="link-line" href="#">Book an Appointment</a></li>
         </ul>
       </nav>
-      <nav class="lg:col-span-2" aria-label="Care">
-        <h3 class="text-[10.5px] label-wide uppercase font-semibold text-fog">Care</h3>
+      <nav class="lg:col-span-2" aria-label="Help">
+        <h3 class="text-[10.5px] label-wide uppercase font-semibold text-fog">Help</h3>
         <ul class="mt-5 space-y-3 text-[13.5px] font-medium">
-          <li><a class="link-line" href="#">Shipping &amp; Returns</a></li>
-          <li><a class="link-line" href="#">Ring Size Guide</a></li>
+          <li><a class="link-line" href="#">Size Guide</a></li>
           <li><a class="link-line" href="#">Jewellery Care</a></li>
-          <li><a class="link-line" href="#">Contact Us</a></li>
+          <li><a class="link-line" href="#">Shipping &amp; Returns</a></li>
+          <li><a class="link-line" href="#">Privacy Policy</a></li>
         </ul>
       </nav>
-      <div class="lg:col-span-2">
-        <h3 class="text-[10.5px] label-wide uppercase font-semibold text-fog">Visit</h3>
-        <address class="not-italic mt-5 text-[13.5px] font-medium body-relaxed text-stone">
-          The Aela Studio<br>
-          14 Goldsmith Row<br>
-          London E2 8QA
-        </address>
-      </div>
+      <nav class="lg:col-span-2" aria-label="Stay connected">
+        <h3 class="text-[10.5px] label-wide uppercase font-semibold text-fog">Stay Connected</h3>
+        <ul class="mt-5 space-y-3 text-[13.5px] font-medium">
+          <li><a class="link-line" href="#">Instagram</a></li>
+          <li><a class="link-line" href="#">Pinterest</a></li>
+          <li><a class="link-line" href="#">Facebook</a></li>
+        </ul>
+      </nav>
     </div>
     <div class="mt-14 pt-7 border-t border-linen/70 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-fog">
       <p>© 2026 Aela Jewels. All rights reserved.</p>
       <div class="flex items-center gap-6">
-        <a class="link-line" href="#">Privacy</a>
         <a class="link-line" href="#">Terms</a>
         <span class="flex items-center gap-2">
           <svg class="w-1.5 h-1.5 text-gold" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0 8 4 4 8 0 4Z"/></svg>
@@ -765,42 +896,42 @@ tailwind.config = {
     menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
   });
 
-  /* featured category tabs */
-  const tabs = [...document.querySelectorAll('[data-tab]')];
-  const panels = [...document.querySelectorAll('[data-tab-panel]')];
-  let ti = 0;
-  const setTab = (n) => {
-    panels[ti].classList.add('hidden');
-    tabs[ti].classList.replace('text-ink', 'text-fog');
-    tabs[ti].classList.add('nav-link');
-    tabs[ti].setAttribute('aria-selected', 'false');
-    ti = (n + tabs.length) % tabs.length;
-    panels[ti].classList.remove('hidden', 'tab-fade');
-    void panels[ti].offsetWidth;
-    panels[ti].classList.add('tab-fade');
-    tabs[ti].classList.replace('text-fog', 'text-ink');
-    tabs[ti].classList.remove('nav-link');
-    tabs[ti].setAttribute('aria-selected', 'true');
-  };
-  tabs.forEach((t, n) => t.addEventListener('click', () => setTab(n)));
-  document.querySelector('[data-featured-prev]')?.addEventListener('click', () => setTab(ti - 1));
-  document.querySelector('[data-featured-next]')?.addEventListener('click', () => setTab(ti + 1));
+  /* tab groups (Love & Engagement, Featured) — each group operates independently */
+  document.querySelectorAll('[data-tabgroup]').forEach((group) => {
+    const tabs = [...group.querySelectorAll('[data-tab]')];
+    const panels = [...group.querySelectorAll('[data-tab-panel]')];
+    let ti = 0;
+    const setTab = (n) => {
+      panels[ti].classList.add('hidden');
+      tabs[ti].classList.replace('text-ink', 'text-fog');
+      tabs[ti].classList.add('nav-link');
+      tabs[ti].setAttribute('aria-selected', 'false');
+      ti = (n + tabs.length) % tabs.length;
+      panels[ti].classList.remove('hidden', 'tab-fade');
+      void panels[ti].offsetWidth;
+      panels[ti].classList.add('tab-fade');
+      tabs[ti].classList.replace('text-fog', 'text-ink');
+      tabs[ti].classList.remove('nav-link');
+      tabs[ti].setAttribute('aria-selected', 'true');
+    };
+    tabs.forEach((t, n) => t.addEventListener('click', () => setTab(n)));
+    group.querySelector('[data-tab-prev]')?.addEventListener('click', () => setTab(ti - 1));
+    group.querySelector('[data-tab-next]')?.addEventListener('click', () => setTab(ti + 1));
+  });
 
-  /* testimonials */
+  /* testimonials (arrow nav) */
   const quotes = [...document.querySelectorAll('[data-quote]')];
-  const dots = [...document.querySelectorAll('[data-quote-dot]')];
   let qi = 0, timer;
   const show = (n) => {
     quotes[qi].classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
     quotes[qi].classList.remove('opacity-100');
-    dots[qi].firstElementChild.classList.replace('bg-gold', 'bg-ink/20');
     qi = (n + quotes.length) % quotes.length;
     quotes[qi].classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
     quotes[qi].classList.add('opacity-100');
-    dots[qi].firstElementChild.classList.replace('bg-ink/20', 'bg-gold');
   };
   const auto = () => { if (!reduced) timer = setInterval(() => show(qi + 1), 6500); };
-  dots.forEach((d, n) => d.addEventListener('click', () => { clearInterval(timer); show(n); auto(); }));
+  document.querySelector('[data-quote-prev]')?.addEventListener('click', () => { clearInterval(timer); show(qi - 1); auto(); });
+  document.querySelector('[data-quote-next]')?.addEventListener('click', () => { clearInterval(timer); show(qi + 1); auto(); });
   auto();
 
   /* newsletter (demo only) */
@@ -811,6 +942,36 @@ tailwind.config = {
     msg.classList.remove('text-cream/50');
     msg.classList.add('text-champagne');
   });
+
+  /* newsletter popup modal */
+  const overlay = document.querySelector('[data-popup-overlay]');
+  const panel = document.querySelector('[data-popup-panel]');
+  const DISMISS_KEY = 'aela-popup-dismissed';
+  const openPopup = () => {
+    if (sessionStorage.getItem(DISMISS_KEY)) return;
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+    requestAnimationFrame(() => panel.classList.remove('opacity-0', 'translate-y-3'));
+    document.addEventListener('keydown', onEscape);
+  };
+  const closePopup = () => {
+    panel.classList.add('opacity-0', 'translate-y-3');
+    sessionStorage.setItem(DISMISS_KEY, '1');
+    setTimeout(() => { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }, reduced ? 0 : 400);
+    document.removeEventListener('keydown', onEscape);
+  };
+  const onEscape = (e) => { if (e.key === 'Escape') closePopup(); };
+  document.querySelector('[data-popup-close]')?.addEventListener('click', closePopup);
+  overlay?.addEventListener('click', (e) => { if (e.target === overlay) closePopup(); });
+  document.querySelector('[data-popup-form]')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const msg = document.querySelector('[data-popup-msg]');
+    msg.textContent = 'Welcome — your gift is on its way.';
+    msg.classList.remove('text-cream/50');
+    msg.classList.add('text-champagne');
+    setTimeout(closePopup, 1400);
+  });
+  if (!reduced) setTimeout(openPopup, 3500);
 })();
 </script>
 </body>
