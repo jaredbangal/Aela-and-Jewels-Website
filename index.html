@@ -85,8 +85,12 @@ tailwind.config = {
   }
   .reveal.is-visible { opacity: 1; transform: none; }
 
-  /* ——— announcement rotator ——— */
-  .announce-msg { transition: opacity .5s var(--ease-spring); }
+  /* ——— announcement marquee ——— */
+  .marquee { position: relative; overflow: hidden; }
+  .marquee-inner { display: flex; width: max-content; animation: marquee 32s linear infinite; }
+  .marquee:hover .marquee-inner { animation-play-state: paused; }
+  .marquee-track { display: flex; align-items: center; }
+  .marquee-item { white-space: nowrap; padding: 0 1.6rem; }
 
   /* ——— image treatments ——— */
   .img-treat { position: relative; overflow: hidden; }
@@ -129,6 +133,7 @@ tailwind.config = {
   /* ——— featured tab panel fade ——— */
   @keyframes fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   .tab-fade { animation: fadein .5s var(--ease-spring); }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   /* ——— popup modal ——— */
   .popup-overlay { transition: opacity .35s var(--ease-spring); }
@@ -147,9 +152,9 @@ tailwind.config = {
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .reveal { opacity: 1; transform: none; transition: none; }
-    .img-zoom, .btn-gold, .link-line::after, .quote-slide, .announce-msg, .popup-panel, .popup-overlay { transition: none; }
+    .img-zoom, .btn-gold, .link-line::after, .quote-slide, .popup-panel, .popup-overlay { transition: none; }
     .group:hover .img-zoom { transform: none; }
-    .float-slow, .float-slower, .float-slowest, .tab-fade { animation: none; }
+    .float-slow, .float-slower, .float-slowest, .tab-fade, .marquee-inner { animation: none; }
     .animate-ping { animation: none; }
   }
 </style>
@@ -158,10 +163,25 @@ tailwind.config = {
 
 <!-- ══════════ Announcement bar ══════════ -->
 <div class="bg-ink text-cream/90" role="region" aria-label="Store announcements">
-  <div class="relative mx-auto max-w-site h-10 px-6 text-[11px] label-wide uppercase font-medium">
-    <p class="announce-msg absolute inset-0 flex items-center justify-center opacity-100" data-announce>Complimentary shipping on orders over $150</p>
-    <p class="announce-msg absolute inset-0 flex items-center justify-center opacity-0" data-announce>Signature gift wrapping, always on us</p>
-    <p class="announce-msg absolute inset-0 flex items-center justify-center opacity-0" data-announce>Duties &amp; taxes included worldwide</p>
+  <div class="marquee h-10 flex items-center text-[11px] label-wide uppercase font-medium">
+    <div class="marquee-inner">
+      <div class="marquee-track">
+        <span class="marquee-item">Complimentary shipping on orders over $150</span>
+        <svg class="w-1.5 h-1.5 text-champagne shrink-0" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0 8 4 4 8 0 4Z"/></svg>
+        <span class="marquee-item">Signature gift wrapping, always on us</span>
+        <svg class="w-1.5 h-1.5 text-champagne shrink-0" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0 8 4 4 8 0 4Z"/></svg>
+        <span class="marquee-item">Duties &amp; taxes included worldwide</span>
+        <svg class="w-1.5 h-1.5 text-champagne shrink-0" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0 8 4 4 8 0 4Z"/></svg>
+      </div>
+      <div class="marquee-track" aria-hidden="true">
+        <span class="marquee-item">Complimentary shipping on orders over $150</span>
+        <svg class="w-1.5 h-1.5 text-champagne shrink-0" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0 8 4 4 8 0 4Z"/></svg>
+        <span class="marquee-item">Signature gift wrapping, always on us</span>
+        <svg class="w-1.5 h-1.5 text-champagne shrink-0" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0 8 4 4 8 0 4Z"/></svg>
+        <span class="marquee-item">Duties &amp; taxes included worldwide</span>
+        <svg class="w-1.5 h-1.5 text-champagne shrink-0" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true"><path d="M4 0 8 4 4 8 0 4Z"/></svg>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -838,17 +858,6 @@ tailwind.config = {
     for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
-
-  /* announcement rotator */
-  const msgs = [...document.querySelectorAll('[data-announce]')];
-  let mi = 0;
-  if (msgs.length > 1 && !reduced) {
-    setInterval(() => {
-      msgs[mi].classList.replace('opacity-100', 'opacity-0');
-      mi = (mi + 1) % msgs.length;
-      msgs[mi].classList.replace('opacity-0', 'opacity-100');
-    }, 4200);
-  }
 
   /* mobile menu */
   const menuBtn = document.querySelector('[data-menu-btn]');
