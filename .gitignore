@@ -10,3 +10,9 @@ zoeandmorgan.co.uk_.png
 4 columns.png
 ss.png
 Screenshot*.png
+
+# raw source uploads (processed versions live in images/ and brand_assets/)
+sample.png
+Logo-*.jpg
+[0-9].png
+[0-9][0-9].png
